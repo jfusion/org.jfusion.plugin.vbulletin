@@ -9,8 +9,6 @@
  * @link       http://www.jfusion.org
  */
 
-use JFusion\Plugin\Plugin_Front;
-
 global $baseURL, $fullURL, $integratedURL, $vbsefmode;
 /**
  * JFusion Public Class for vBulletin
@@ -24,7 +22,7 @@ global $baseURL, $fullURL, $integratedURL, $vbsefmode;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU/GPL
  * @link       http://www.jfusion.org
  */
-class Front extends Plugin_Front
+class Front extends \JFusion\Plugin\Front
 {
 	/**
 	 * @var Helper

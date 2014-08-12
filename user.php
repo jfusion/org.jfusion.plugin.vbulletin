@@ -37,7 +37,7 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU/GPL
  * @link       http://www.jfusion.org
  */
-class User extends Plugin_User
+class User extends \JFusion\Plugin\User
 {
 	/**
 	 * @var $helper Helper
