@@ -1688,7 +1688,7 @@ PHP;
 				$setplugins = '';
 			}
 
-			$hookFile = __DIR__ . DIRECTORY_SEPARATOR . 'hooks.php';
+			$hookFile = __DIR__ . '/hooks.php';
 			$path = str_replace(DIRECTORY_SEPARATOR . 'administrator', '', JPATH_BASE);
 			$secret = $this->params->get('vb_secret', $config->get('secret'));
 
@@ -1828,7 +1828,7 @@ PHP;
 		global $vbsefmode, $vbJname, $vbsefenabled, $baseURL, $integratedURL, $hookFile;
 		//make sure the curl model is loaded for the hooks file
 		if (!class_exists('JFusionCurl')) {
-			require_once JPATH_ADMINISTRATOR . DIRECTORY_SEPARATOR . 'components' . DIRECTORY_SEPARATOR . 'com_jfusion' . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . 'model.curl.php';
+			require_once JPATH_ADMINISTRATOR . '/components/com_jfusion/models/model.curl.php';
 		}
 		//define('_JFUSION_DEBUG',1);
 		define('_VBFRAMELESS', 1);
@@ -1923,11 +1923,8 @@ PHP;
 					$jfile = 'index.php';
 				}
 				//combine the path and filename
-				if (substr($source_path, -1) == DIRECTORY_SEPARATOR) {
-					$index_file = $source_path . $jfile;
-				} else {
-					$index_file = $source_path . DIRECTORY_SEPARATOR . $jfile;
-				}
+				$index_file = $source_path . $jfile;
+
 				if (!is_file($index_file)) {
 					Framework::raise(LogLevel::WARNING, 'The path to the requested does not exist', $this->getJname());
 				} else {

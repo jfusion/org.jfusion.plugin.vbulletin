@@ -60,8 +60,8 @@ class Admin extends \JFusion\Plugin\Admin
 	 */
 	function setupFromPath($softwarePath)
 	{
-		$myfile = $softwarePath . 'includes' . DIRECTORY_SEPARATOR . 'config.php';
-		$funcfile = $softwarePath . 'includes' . DIRECTORY_SEPARATOR . 'functions.php';
+		$myfile = $softwarePath . 'includes/config.php';
+		$funcfile = $softwarePath . 'includes/functions.php';
 
 		//try to open the file
 		$params = array();
@@ -573,7 +573,7 @@ HTML;
 	 */
 	function getHookPHP($plugin)
 	{
-		$hookFile = __DIR__ . DIRECTORY_SEPARATOR . 'hooks.php';
+		$hookFile = __DIR__ . '/hooks.php';
 		$php = "defined('_VBJNAME') or define('_VBJNAME', '{$this->getJname()}');\n";
 		$php .= "defined('JPATH_PATH') or define('JPATH_BASE', '" . (str_replace(DIRECTORY_SEPARATOR . 'administrator', '', JPATH_BASE)) . "');\n";
 		$php .= "defined('JFUSION_VB_HOOK_FILE') or define('JFUSION_VB_HOOK_FILE', '$hookFile');\n";
