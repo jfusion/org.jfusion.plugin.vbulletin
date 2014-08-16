@@ -16,6 +16,7 @@ use JFusion\Plugins\vbulletin\Helper;
 use JFusion\Plugin\Platform\Joomla;
 
 use Joomla\Language\Text;
+use Joomla\Registry\Registry;
 use Joomla\Uri\Uri;
 
 use Psr\Log\LogLevel;
@@ -23,7 +24,6 @@ use Psr\Log\LogLevel;
 use JFusionFunction;
 use JFactory;
 use JPluginHelper;
-use JRegistry;
 use JUri;
 
 use RuntimeException;
@@ -113,7 +113,7 @@ class Platform extends Joomla
     }
 
 	/**
-	 * @param JRegistry &$dbparams
+	 * @param Registry &$dbparams
 	 * @param object    &$contentitem
 	 * @param int       $forumid
 	 *
@@ -203,7 +203,7 @@ class Platform extends Joomla
     }
 
 	/**
-	 * @param JRegistry $params
+	 * @param Registry $params
 	 * @param stdClass  $ids      stdClass with forum id ($ids->forumid, thread id ($ids->threadid) and first post id ($ids->postid)
 	 * @param object    $contentitem
 	 * @param Userinfo  $userinfo
@@ -262,7 +262,7 @@ class Platform extends Joomla
 		    $threadinfo = $this->getThreadInfo($ids->threadid, $params);
 		    $post_approved = ($userinfo->guest && ($foruminfo['moderatenewposts'] || $params->get('moderate_guests', 1))) ? 0 : 1;
 		    $title = 'Re: ' . $threadinfo['title'];
-		    $this->prepareText($title, 'forum', new JRegistry());
+		    $this->prepareText($title, 'forum', new Registry());
 
 		    $apidata = array(
 			    'userinfo' => $this->helper->convertUserData($userinfo),
@@ -291,7 +291,7 @@ class Platform extends Joomla
     }
 
     /**
-     * @param JRegistry &$dbparams
+     * @param Registry &$dbparams
      * @param object &$existingthread
      * @param object &$contentitem
      *
@@ -397,7 +397,7 @@ class Platform extends Joomla
 	}
 
 	/**
-	 * @param JRegistry $dbparams with discussion bot parameters
+	 * @param Registry $dbparams with discussion bot parameters
 	 * @param object $existingthread object with forumid, threadid, and postid (first post in thread)
 	 * @param int $start
 	 * @param int $limit
@@ -1347,7 +1347,7 @@ class Platform extends Joomla
 	/**
 	 * @param string $text
 	 * @param string $for
-	 * @param JRegistry $params
+	 * @param Registry $params
 	 *
 	 * @return array
 	 */
@@ -1748,7 +1748,7 @@ PHP;
 
 	/**
 	 * @param string &$where
-	 * @param JRegistry &$pluginParam
+	 * @param Registry &$pluginParam
 	 * @param string $ordering
 	 *
 	 * @return void
