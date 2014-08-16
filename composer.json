@@ -2,7 +2,7 @@
     "name": "jfusion/plugin-vbulletin",
     "type": "jfusion-plugin",
     "description": "Plugin for vbulletin jfusion framework",
-    "keywords": ["jfusion", "plugin", "vbulletin", "framework"],
+    "keywords": ["jfusion", "plugin", "vbulletin"],
     "homepage": "http://jfusion.org",
     "license": "GPL-2.0+",
     "authors": [
