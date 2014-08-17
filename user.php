@@ -12,7 +12,6 @@
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\User\Userinfo;
-use JFusion\Plugin\Plugin_User;
 
 use Joomla\Form\Html\Select;
 use Joomla\Language\Text;
@@ -123,7 +122,6 @@ class User extends \JFusion\Plugin\User
 				$activationgroup = $this->params->get('activationgroup');
 
 				if ($activationgroup == $result->group_id) {
-					jimport('joomla.user.helper');
 					$result->activation = Framework::genRandomPassword(32);
 				} else {
 					$result->activation = '';
@@ -361,7 +359,6 @@ class User extends \JFusion\Plugin\User
 	 */
 	function updatePassword(Userinfo $userinfo, Userinfo &$existinguser)
 	{
-		jimport('joomla.user.helper');
 		$existinguser->password_salt = Framework::genRandomPassword(3);
 		$existinguser->password = md5(md5($userinfo->password_clear) . $existinguser->password_salt);
 
@@ -599,7 +596,6 @@ class User extends \JFusion\Plugin\User
 			$useractivation = new stdClass;
 			$useractivation->userid = $existinguser->userid;
 			$useractivation->dateline = time();
-			jimport('joomla.user.helper');
 			$useractivation->activationid = Framework::genRandomPassword(40);
 
 			$usergroups = $this->getCorrectUserGroups($existinguser);
@@ -659,7 +655,6 @@ class User extends \JFusion\Plugin\User
 
 			if (!isset($userinfo->password_clear)) {
 				//clear password is not available, set a random password for now
-				jimport('joomla.user.helper');
 				$random_password = Framework::getHash(Framework::genRandomPassword(10));
 				$userinfo->password_clear = $random_password;
 			}

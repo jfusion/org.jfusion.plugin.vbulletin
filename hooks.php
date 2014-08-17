@@ -525,7 +525,7 @@ class executeJFusionHook
         require_once JPATH_BASE . '/components/com_jfusion/jfusionapi.php';
 	    /**
 	     * @ignore
-	     * @var $joomla \JFusion\Api\Platform_Joomla
+	     * @var $joomla \JFusion\Api\Platform\Joomla
 	     */
 	    $joomla = Platform::getTypeInstance('joomla');
 	    $mainframe = $joomla->getApplication();

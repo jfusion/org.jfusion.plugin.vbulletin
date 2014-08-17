@@ -1636,7 +1636,7 @@ HTML;
 			if (!strpos($baseURL, '?')) {
 				$baseURL .= '/';
 			}
-			$juri = new \JUri($joomla_url);
+			$juri = new Uri($joomla_url);
 			$path = $juri->getPath();
 			if ($path != '/') {
 				$baseURL = str_replace($path, '', $baseURL);
