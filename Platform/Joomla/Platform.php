@@ -1002,7 +1002,7 @@ class Platform extends Joomla
                         $counter--;
                     } elseif (!($perms & CAN_VIEW_THREAD_CONTENT)) {
                         //user cannot view posts within the thread
-                        if (defined('ACTIVITY_MODE') && ACTIVITY_MODE == LCP) {
+                        if (defined('ACTIVITY_MODE') && ACTIVITY_MODE == self::LCP) {
                             //in activity module and using latest created post mode so remove the entire post
                             unset($results[$k]);
                             $counter--;
@@ -1079,7 +1079,6 @@ class Platform extends Joomla
 			$cookie_password = $mainframe->input->cookie->get($cookie_prefix . 'password', '');
 			$JUser = JFactory::getUser();
 			if (JPluginHelper::isEnabled('system', 'remember')) {
-				jimport('joomla.utilities.utility');
 				$hash = Framework::getHash('JLOGIN_REMEMBER');
 
 				$joomla_persistant_cookie = $mainframe->input->cookie->get($hash, '', 'raw');
