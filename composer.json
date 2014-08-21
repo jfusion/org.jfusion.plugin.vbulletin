@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "JFusion\\Plugins\\vbulletin\\": "."
+            "JFusion\\Plugins\\vbulletin\\": "src/"
         }
     }
 }
