@@ -15,6 +15,7 @@
 
 //force required variables into global scope
 use JFusion\Api\Platform;
+use JFusion\Application\Application;
 
 if (!isset($GLOBALS['vbulletin']) && !empty($vbulletin)) {
     $GLOBALS['vbulletin'] = & $vbulletin;
@@ -207,7 +208,7 @@ class executeJFusionJoomlaHook
                     $show['nojs_link'] = $url;
                     $show['nojs_link'].= (substr($url, -1) != '/') ? '/nojs,1/' : 'nojs,1/';
                 } else {
-	                $jfile = \JFusion\Factory::getApplication()->input->get('jfile', false);
+	                $jfile = Application::getInstance()->input->get('jfile', false);
                     $jfile = ($jfile) ? $jfile : 'index.php';
                     $show['nojs_link'] = $jfile . '?nojs=1';
                 }

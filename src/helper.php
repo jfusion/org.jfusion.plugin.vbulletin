@@ -9,6 +9,7 @@
  * @link       http://www.jfusion.org
  */
 
+use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\Plugin\Plugin;
@@ -245,7 +246,7 @@ class Helper extends Plugin
     {
         $this->backup['globals'] = $GLOBALS;
         //let's take special precautions for Itemid
-        $this->backup['itemid'] = Factory::getApplication()->input->getInt('Itemid', 0);
+        $this->backup['itemid'] = Application::getInstance()->input->getInt('Itemid', 0);
     }
 
     /**
@@ -260,7 +261,7 @@ class Helper extends Plugin
             $GLOBALS = $this->backup['globals'];
         }
         if (isset($this->backup['itemid'])) {
-	        Factory::getApplication()->input->set('Itemid', $this->backup['itemid']);
+	        Application::getInstance()->input->set('Itemid', $this->backup['itemid']);
             global $Itemid;
             $Itemid = $this->backup['itemid'];
         }
@@ -357,7 +358,7 @@ class Helper extends Plugin
 						    $query = $db->getQuery(true)
 							    ->select('threadid')
 							    ->from('#__post')
-							    ->where('postid = ' . $pid);
+							    ->where('postid = ' . (int)$pid);
 
 						    $db->setQuery($query);
 						    $tid = $db->loadResult();
@@ -365,7 +366,7 @@ class Helper extends Plugin
 						    $query = $db->getQuery(true)
 							    ->select('title')
 							    ->from('#__thread')
-							    ->where('threadid = ' . $tid);
+							    ->where('threadid = ' . (int)$tid);
 
 						    $db->setQuery($query);
 						    $title = $db->loadResult();

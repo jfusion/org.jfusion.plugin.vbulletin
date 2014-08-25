@@ -9,6 +9,7 @@
  * @link       http://www.jfusion.org
  */
 
+use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
 
@@ -412,8 +413,8 @@ HTML;
 				$tables = array('smilie' => 'smiliepath', 'avatar' => 'avatarpath', 'icon' => 'iconpath');
 				foreach ($tables as $tbl => $col) {
 					$query = $db->getQuery(true)
-						->select($col)
-						->from('#__' . $tbl);
+						->select($db->quoteName($col))
+						->from($db->quoteName('#__' . $tbl));
 
 					$db->setQuery($query);
 					$images = $db->loadRowList();
@@ -465,7 +466,7 @@ HTML;
 		try {
 			$db = Factory::getDatabase($this->getJname());
 			if ($hook != 'framelessoptimization') {
-				$params = Factory::getApplication()->input->get('params', array(), 'array');
+				$params = Application::getInstance()->input->get('params', array(), 'array');
 				$itemid = $params['plugin_itemid'];
 
 				$hookName = static::$mods[$hook];
@@ -514,24 +515,24 @@ HTML;
 					$criteria = ($action == 'enable') ? 'NOT LIKE \'http%\'' : 'LIKE \'%http%\'';
 
 					$query = $db->getQuery(true)
-						->select($tbl . 'id, ' . $col)
-						->from('#__' . $tbl)
-						->where($col . ' ' . $criteria);
+						->select($db->quoteName($tbl . 'id, ' . $col))
+						->from($db->quoteName('#__' . $tbl))
+						->where($db->quoteName($col) . ' ' . $criteria);
 
 					$db->setQuery($query);
 					$images = $db->loadRowList();
 					foreach ($images as $i) {
 						$q = $db->getQuery(true)
-							->update('#__' . $tbl);
+							->update($db->quoteName('#__' . $tbl));
 
 						if ($action == 'enable') {
-							$q->set($col . ' = ' . $q->quote($source_url . $i[1]));
+							$q->set($db->quoteName($col) . ' = ' . $q->quote($source_url . $i[1]));
 						} else {
 							$i[1] = str_replace($source_url, '', $i[1]);
-							$q->set($col . ' = ' . $q->quote($i[1]));
+							$q->set($db->quoteName($col) . ' = ' . $q->quote($i[1]));
 						}
 
-						$q->where($tbl . 'id = ' . $i[0]);
+						$q->where($db->quoteName($tbl . 'id') . ' = ' . $q->quote($i[0]));
 
 						$db->setQuery($q);
 						$db->execute();
@@ -695,7 +696,7 @@ HTML;
 			$query = $db->getQuery(true)
 				->delete('#__plugin')
 				->where('hookname = ' . $db->quote('init_startup'))
-				->where('title IN (' . implode(', ', $hookNames) . ')');
+				->where('title IN (' . $db->quote(implode(', ', $hookNames)) . ')');
 
 			$db->setQuery($query);
 			$db->execute();
@@ -732,7 +733,7 @@ HTML;
 	{
 		$jname = $this->getJname();
 
-		Factory::getApplication()->loadScriptLanguage(array('MAIN_USERGROUP', 'DISPLAYGROUP', 'DEFAULT', 'MEMBERGROUPS'));
+		Application::getInstance()->loadScriptLanguage(array('MAIN_USERGROUP', 'DISPLAYGROUP', 'DEFAULT', 'MEMBERGROUPS'));
 
 		$js = <<<JS
 		JFusion.renderPlugin['{$jname}'] = function(index, plugin, pair) {

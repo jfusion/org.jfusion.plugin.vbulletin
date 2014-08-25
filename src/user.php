@@ -9,6 +9,7 @@
  * @link       http://www.jfusion.org
  */
 
+use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\User\Userinfo;
@@ -75,7 +76,7 @@ class User extends \JFusion\Plugin\User
 			$query = $db->getQuery(true)
 				->select('u.userid, u.username, u.email, u.usergroupid AS group_id, u.membergroupids, u.displaygroupid, u.password, u.salt as password_salt, u.usertitle, u.customtitle, u.posts, u.username as name')
 				->from('#__user AS u')
-				->where($identifier_type . ' = ' . $db->quote($identifier));
+				->where($db->quoteName($identifier_type) . ' = ' . $db->quote($identifier));
 
 			if ($ignore_id) {
 				$query->where('u.userid != ' . $ignore_id);
@@ -88,7 +89,7 @@ class User extends \JFusion\Plugin\User
 				$query = $db->getQuery(true)
 					->select('title')
 					->from('#__usergroup')
-					->where('usergroupid = ' . $result->group_id);
+					->where('usergroupid = ' . (int)$result->group_id);
 
 				$db->setQuery($query);
 				$result->group_name = $db->loadResult();
@@ -97,7 +98,7 @@ class User extends \JFusion\Plugin\User
 					$query = $db->getQuery(true)
 						->select($name_field)
 						->from('#__userfield')
-						->where('userid = ' . $result->userid);
+						->where('userid = ' . (int)$result->userid);
 
 					$db->setQuery($query);
 					$name = $db->loadResult();
@@ -109,7 +110,7 @@ class User extends \JFusion\Plugin\User
 				$query = $db->getQuery(true)
 					->select('userid')
 					->from('#__userban')
-					->where('userid = ' . $result->userid);
+					->where('userid = ' . (int)$result->userid);
 
 				$db->setQuery($query);
 				if ($db->loadObject() || ($this->params->get('block_coppa_users', 1) && (int) $result->group_id == 4)) {
@@ -177,7 +178,7 @@ class User extends \JFusion\Plugin\User
 	{
 		$status = array('error' => array(), 'debug' => array());
 		try {
-			$mainframe = Factory::getApplication();
+			$mainframe = Application::getInstance();
 			$cookie_prefix = $this->params->get('cookie_prefix');
 			$vbversion = $this->helper->getVersion();
 			if ((int) substr($vbversion, 0, 1) > 3) {
@@ -280,7 +281,7 @@ class User extends \JFusion\Plugin\User
 						->select('COUNT(*)')
 						->from('#__strikes')
 						->where('strikeip = ' . $db->quote($ip))
-						->where('striketime >= ' . $time);
+						->where('striketime >= ' . (int)$time);
 
 					$db->setQuery($query);
 					$strikes = $db->loadResult();
@@ -312,12 +313,12 @@ class User extends \JFusion\Plugin\User
 				$query = $db->getQuery(true)
 					->select('sessionhash')
 					->from('#__session')
-					->where('userid = ' . $userinfo->userid);
+					->where('userid = ' . (int)$userinfo->userid);
 
 				$db->setQuery($query);
 				$sessionhash = $db->loadResult();
 
-				$mainframe = Factory::getApplication();
+				$mainframe = Application::getInstance();
 				$cookie_sessionhash = $mainframe->input->cookie->get($cookie_prefix . 'sessionhash', '');
 				$cookie_userid = $mainframe->input->cookie->get($cookie_prefix . 'userid', '');
 				$cookie_password = $mainframe->input->cookie->get($cookie_prefix . 'password', '');
@@ -371,7 +372,7 @@ class User extends \JFusion\Plugin\User
 			->set('passworddate = ' . $db->quote($date))
 			->set('password = ' . $db->quote($existinguser->password))
 			->set('salt = ' . $db->quote($existinguser->password_salt))
-			->where('userid  = ' . $existinguser->userid);
+			->where('userid  = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$db->execute();
@@ -417,8 +418,8 @@ class User extends \JFusion\Plugin\User
 		//update the usergroup to banned
 		$query = $db->getQuery(true)
 			->update('#__user')
-			->set('usergroupid = ' . $bannedgroup)
-			->where('userid  = ' . $existinguser->userid);
+			->set('usergroupid = ' . $db->quote($bannedgroup))
+			->where('userid  = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 
@@ -441,7 +442,7 @@ class User extends \JFusion\Plugin\User
 		$query = $db->getQuery(true)
 			->select('COUNT(*)')
 			->from('#__userban')
-			->where('userid = ' . $existinguser->userid);
+			->where('userid = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$banned = $db->loadResult();
@@ -483,7 +484,7 @@ class User extends \JFusion\Plugin\User
 			->from('#__userban AS b')
 			->innerJoin('#__user AS u ON b.userid = u.userid')
 			->innerJoin('#__usergroup AS g ON u.usergroupid = g.usergroupid')
-			->where('b.userid = ' . $existinguser->userid);
+			->where('b.userid = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$result = $db->loadObject();
@@ -509,7 +510,7 @@ class User extends \JFusion\Plugin\User
 			//remove any banned user catches from vbulletin database
 			$query = $db->getQuery(true)
 				->delete('#__userban')
-				->where('userid = ' . $existinguser->userid);
+				->where('userid = ' . (int)$existinguser->userid);
 
 			$db->setQuery($query);
 			$db->execute();
@@ -543,8 +544,8 @@ class User extends \JFusion\Plugin\User
 
 		$query = $db->getQuery(true)
 			->update('#__user')
-			->set('usergroupid = ' . $usergroup->defaultgroup)
-			->where('userid  = ' . $existinguser->userid);
+			->set('usergroupid = ' . $db->quote($usergroup->defaultgroup))
+			->where('userid  = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$db->execute();
@@ -552,7 +553,7 @@ class User extends \JFusion\Plugin\User
 		//remove any activation catches from vbulletin database
 		$query = $db->getQuery(true)
 			->delete('#__useractivation')
-			->where('userid = ' . $existinguser->userid);
+			->where('userid = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$db->execute();
@@ -576,8 +577,8 @@ class User extends \JFusion\Plugin\User
 
 		$query = $db->getQuery(true)
 			->update('#__user')
-			->set('usergroupid = ' . $activationgroup)
-			->where('userid  = ' . $existinguser->userid);
+			->set('usergroupid = ' . $db->quote($activationgroup))
+			->where('userid  = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$db->execute();
@@ -587,7 +588,7 @@ class User extends \JFusion\Plugin\User
 		$query = $db->getQuery(true)
 			->select('COUNT(*)')
 			->from('#__useractivation')
-			->where('userid = ' . $existinguser->userid);
+			->where('userid = ' . (int)$existinguser->userid);
 
 		$db->setQuery($query);
 		$count = $db->loadResult();
@@ -690,7 +691,7 @@ class User extends \JFusion\Plugin\User
 						$query = $db->getQuery(true)
 							->update('#__user')
 							->set('password = ' . $db->quote($userinfo->password))
-							->where('userid  = ' . $userdmid);
+							->where('userid  = ' . (int)$userdmid);
 
 						$db->setQuery($query);
 						$db->execute();
@@ -812,7 +813,7 @@ class User extends \JFusion\Plugin\User
 			$query = $db->getQuery(true)
 				->select('usertitle')
 				->from('#__usergroup')
-				->where('usergroupid = ' . $groupid);
+				->where('usergroupid = ' . (int)$groupid);
 
 			$db->setQuery($query);
 			$title = $db->loadResult();
@@ -821,7 +822,7 @@ class User extends \JFusion\Plugin\User
 				$query = $db->getQuery(true)
 					->select('title')
 					->from('#__usertitle')
-					->where('minposts <= ' . $posts)
+					->where('minposts <= ' . (int)$posts)
 					->order('minposts DESC');
 
 				$db->setQuery($query, 0, 1);
@@ -969,7 +970,7 @@ class User extends \JFusion\Plugin\User
 				}
 			}
 
-			$mainframe = Factory::getApplication();
+			$mainframe = Application::getInstance();
 			if (!$mainframe->isAdmin()) {
 				//login to vB
 				$options = array();
