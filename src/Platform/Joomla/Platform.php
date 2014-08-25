@@ -637,16 +637,15 @@ class Platform extends Joomla
     /**
      * @param array $usedforums
      * @param string $result_order
-     * @param int $result_limit
+     *
      * @return array
      */
-    function getActivityQuery($usedforums, $result_order, $result_limit)
+    function getActivityQuery($usedforums, $result_order)
     {
         $usedforums = $this->filterForumList($usedforums);
         //if no there were no forums passed, the entire list is called and filtered in filterForumList
         //however if for some reason filterForumList fails, set forumid to 0 to prevent anything from showing protecting private forums
-        $where = (!empty($usedforums)) ? 'WHERE a.forumid IN (' . implode(',', $usedforums) . ') AND b.visible = 1 AND c.password = ""' : 'WHERE a.forumid = 0 AND b.visible = 1 AND c.password = ""';
-        $end = $result_order . ' LIMIT 0,' . ($result_limit + 25);
+        $where = (!empty($usedforums)) ? 'WHERE a.forumid IN (' . implode(', ', $usedforums) . ') AND b.visible = 1 AND c.password = ""' : 'WHERE a.forumid = 0 AND b.visible = 1 AND c.password = ""';
 
         $numargs = func_num_args();
 
@@ -656,7 +655,7 @@ class Platform extends Joomla
 		        $filters = func_get_args();
 		        for ($i = 3; $i < $numargs; $i++) {
 			        if ($filters[$i][0] == 'userid') {
-				        $where.= ' AND b.userid = ' . $db->quote($filters[$i][1]);
+				        $where .= ' AND b.userid = ' . $db->quote($filters[$i][1]);
 			        }
 		        }
 	        } catch (Exception $e) {
@@ -668,40 +667,40 @@ class Platform extends Joomla
         $query = array();
         if (empty($name_field)) {
             //Latest active topic with first post info
-            $query[self::LAT . '0'] = 'SELECT a.threadid, a.lastpostid AS postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.lastpost ' . $end;
+            $query[self::LAT . '0'] = 'SELECT a.threadid, a.lastpostid AS postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.lastpost ' . $result_order;
 
             //Latest active topic with lastest post info
-            $query[self::LAT . '1'] = 'SELECT a.threadid, a.lastpostid AS postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.lastpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.lastpost ' . $end;
+            $query[self::LAT . '1'] = 'SELECT a.threadid, a.lastpostid AS postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.lastpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.lastpost ' . $result_order;
 
             //Latest created topic
-            $query[self::LCT] = 'SELECT a.threadid, b.postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.dateline ' . $end;
+            $query[self::LCT] = 'SELECT a.threadid, b.postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, a.title AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY a.dateline ' . $result_order;
 
             //Latest created post
-            $query[self::LCP] = 'SELECT b.threadid, b.postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, CASE WHEN b.title = \'\' THEN CONCAT("Re: ",a.title) ELSE b.title END AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` AS b ON a.threadid = b.threadid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY b.dateline ' . $end;
+            $query[self::LCP] = 'SELECT b.threadid, b.postid, b.username, b.username as name, b.userid, CASE WHEN b.userid = 0 THEN 1 ELSE 0 END AS guest, CASE WHEN b.title = \'\' THEN CONCAT("Re: ",a.title) ELSE b.title END AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost FROM `#__thread` as a INNER JOIN `#__post` AS b ON a.threadid = b.threadid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' ORDER BY b.dateline ' . $result_order;
         } else {
             //Latest active topic with first post info
             $query[self::LAT . '0'] = '(SELECT a.threadid, a.lastpostid AS postid, b.username, b.userid, 0 AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost, a.lastpost as order_by_date, CASE WHEN f.' . $name_field . ' IS NULL OR f.' . $name_field . ' = \'\' THEN b.username ELSE f.' . $name_field . ' END AS name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid INNER JOIN `#__userfield` as f ON f.userid = b.userid ' . $where . ' AND b.userid != 0)';
             $query[self::LAT . '0'].= ' UNION ';
             $query[self::LAT . '0'].= '(SELECT a.threadid, a.lastpostid AS postid, b.username, b.userid, 1 AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost, a.lastpost as order_by_date, b.username as name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' AND b.userid = 0)';
-            $query[self::LAT . '0'].= ' ORDER BY order_by_date ' . $end;
+            $query[self::LAT . '0'].= ' ORDER BY order_by_date ' . $result_order;
 
             //Latest active topic with lastest post info
             $query[self::LAT . '1'] = '(SELECT a.threadid, a.lastpostid AS postid, b.username, b.userid, 0 AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost, a.lastpost as order_by_date, CASE WHEN f.' . $name_field . ' IS NULL OR f.' . $name_field . ' = \'\' THEN b.username ELSE f.' . $name_field . ' END AS name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.lastpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid INNER JOIN `#__userfield` as f ON f.userid = b.userid ' . $where . ' AND b.userid != 0)';
             $query[self::LAT . '1'].= ' UNION ';
             $query[self::LAT . '1'].= '(SELECT a.threadid, a.lastpostid AS postid, b.username, b.userid, 1 AS guest, a.title AS subject, b.dateline, a.forumid, a.lastpost, a.lastpost as order_by_date, b.username as name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.lastpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' AND b.userid = 0)';
-            $query[self::LAT . '1'].= ' ORDER BY order_by_date ' . $end;
+            $query[self::LAT . '1'].= ' ORDER BY order_by_date ' . $result_order;
 
             //Latest created topic
             $query[self::LCT] = '(SELECT a.threadid, b.postid, b.username, b.userid, 0 AS guest, a.title AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost, a.dateline as order_by_date, CASE WHEN f.' . $name_field.' IS NULL OR f.' . $name_field . ' = \'\' THEN b.username ELSE f.' . $name_field . ' END AS name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid INNER JOIN `#__userfield` as f ON f.userid = b.userid ' . $where . ' AND b.userid != 0)';
             $query[self::LCT].= ' UNION ';
             $query[self::LCT].= '(SELECT a.threadid, b.postid, b.username, b.userid, 1 AS guest, a.title AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost, a.dateline as order_by_date, b.username AS name FROM `#__thread` as a INNER JOIN `#__post` as b ON a.firstpostid = b.postid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' and b.userid = 0)';
-            $query[self::LCT].= ' ORDER BY order_by_date ' . $end;
+            $query[self::LCT].= ' ORDER BY order_by_date ' . $result_order;
 
             //Latest created post
             $query[self::LCP] = '(SELECT b.threadid, b.postid, b.username, b.userid, 0 AS guest, CASE WHEN b.title = \'\' THEN CONCAT("Re: ",a.title) ELSE b.title END AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost, b.dateline as order_by_date, CASE WHEN f.' . $name_field . ' IS NULL OR f.' . $name_field . ' = \'\' THEN b.username ELSE f.' . $name_field . ' END AS name FROM `#__thread` as a INNER JOIN `#__post` AS b ON a.threadid = b.threadid INNER JOIN #__forum as c ON a.forumid = c.forumid INNER JOIN `#__userfield` as f ON f.userid = b.userid ' . $where . ' AND b.userid != 0)';
             $query[self::LCP].= ' UNION ';
             $query[self::LCP].= '(SELECT b.threadid, b.postid, b.username, b.userid, 1 AS guest, CASE WHEN b.title = \'\' THEN CONCAT("Re: ",a.title) ELSE b.title END AS subject, b.dateline, b.pagetext AS body, a.forumid, a.lastpost, b.dateline as order_by_date, b.username AS name FROM `#__thread` as a INNER JOIN `#__post` AS b ON a.threadid = b.threadid INNER JOIN #__forum as c ON a.forumid = c.forumid ' . $where . ' AND b.userid = 0)';
-            $query[self::LCP].= ' ORDER BY order_by_date ' . $end;
+            $query[self::LCP].= ' ORDER BY order_by_date ' . $result_order;
         }
         return $query;
     }
