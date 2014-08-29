@@ -123,7 +123,7 @@ class User extends \JFusion\Plugin\User
 				$activationgroup = $this->params->get('activationgroup');
 
 				if ($activationgroup == $result->group_id) {
-					$result->activation = Framework::genRandomPassword(32);
+					$result->activation = $this->genRandomPassword(32);
 				} else {
 					$result->activation = '';
 				}
@@ -360,7 +360,7 @@ class User extends \JFusion\Plugin\User
 	 */
 	function updatePassword(Userinfo $userinfo, Userinfo &$existinguser)
 	{
-		$existinguser->password_salt = Framework::genRandomPassword(3);
+		$existinguser->password_salt = $this->genRandomPassword(3);
 		$existinguser->password = md5(md5($userinfo->password_clear) . $existinguser->password_salt);
 
 		$date = date('Y-m-d');
@@ -597,7 +597,7 @@ class User extends \JFusion\Plugin\User
 			$useractivation = new stdClass;
 			$useractivation->userid = $existinguser->userid;
 			$useractivation->dateline = time();
-			$useractivation->activationid = Framework::genRandomPassword(40);
+			$useractivation->activationid = $this->genRandomPassword(40);
 
 			$usergroups = $this->getCorrectUserGroups($existinguser);
 			$usergroup = $usergroups[0];
@@ -656,7 +656,7 @@ class User extends \JFusion\Plugin\User
 
 			if (!isset($userinfo->password_clear)) {
 				//clear password is not available, set a random password for now
-				$random_password = Framework::getHash(Framework::genRandomPassword(10));
+				$random_password = Framework::getHash($this->genRandomPassword(10));
 				$userinfo->password_clear = $random_password;
 			}
 
