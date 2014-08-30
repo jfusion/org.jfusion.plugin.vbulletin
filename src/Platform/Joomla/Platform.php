@@ -1909,8 +1909,7 @@ PHP;
 							}
 							$url = $integratedURL . substr($url, strpos($url, $r));
 						}
-						$mainframe = Application::getInstance();
-						$mainframe->redirect($url);
+						JFactory::getApplication()->redirect($url);
 					}
 				}
 				//get the filename
