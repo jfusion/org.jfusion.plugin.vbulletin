@@ -251,103 +251,96 @@ class User extends \JFusion\Plugin\User
 
 	/**
 	 * @param Userinfo $userinfo
-	 * @param array $options
+	 * @param array    $options
+	 *
+	 * @throws \RuntimeException
 	 * @return array
 	 */
 	function createSession(Userinfo $userinfo, $options)
 	{
 		$status = array('error' => array(), 'debug' => array());
-		try {
-			//do not create sessions for blocked users
-			if (!empty($userinfo->block) || !empty($userinfo->activation)) {
-				throw new RuntimeException(Text::_('FUSION_BLOCKED_USER'));
-			} else {
-				//first check to see if striking is enabled to prevent further strikes
-				$db = Factory::getDatabase($this->getJname());
+		//first check to see if striking is enabled to prevent further strikes
+		$db = Factory::getDatabase($this->getJname());
 
-				$query = $db->getQuery(true)
-					->select('value')
-					->from('#__setting')
-					->where('varname = ' . $db->quote('usestrikesystem'));
+		$query = $db->getQuery(true)
+			->select('value')
+			->from('#__setting')
+			->where('varname = ' . $db->quote('usestrikesystem'));
 
-				$db->setQuery($query);
-				$strikeEnabled = $db->loadResult();
+		$db->setQuery($query);
+		$strikeEnabled = $db->loadResult();
 
-				if ($strikeEnabled) {
-					$ip = $_SERVER['REMOTE_ADDR'];
-					$time = strtotime('-15 minutes');
+		if ($strikeEnabled) {
+			$ip = $_SERVER['REMOTE_ADDR'];
+			$time = strtotime('-15 minutes');
 
-					$query = $db->getQuery(true)
-						->select('COUNT(*)')
-						->from('#__strikes')
-						->where('strikeip = ' . $db->quote($ip))
-						->where('striketime >= ' . (int)$time);
+			$query = $db->getQuery(true)
+				->select('COUNT(*)')
+				->from('#__strikes')
+				->where('strikeip = ' . $db->quote($ip))
+				->where('striketime >= ' . (int)$time);
 
-					$db->setQuery($query);
-					$strikes = $db->loadResult();
+			$db->setQuery($query);
+			$strikes = $db->loadResult();
 
-					if ($strikes >= 5) {
-						throw new RuntimeException(Text::_('VB_TOO_MANY_STRIKES'));
-					}
-				}
-
-				//make sure a session is not already active for this user
-				$cookie_prefix = $this->params->get('cookie_prefix');
-				$vbversion = $this->helper->getVersion();
-				if ((int) substr($vbversion, 0, 1) > 3) {
-					if (substr($cookie_prefix, -1) !== '_') {
-						$cookie_prefix .= '_';
-					}
-				}
-				$cookie_salt = $this->params->get('cookie_salt');
-				$cookie_domain = $this->params->get('cookie_domain');
-				$cookie_path = $this->params->get('cookie_path');
-				$cookie_expires  = (!empty($options['remember'])) ? 0 : $this->params->get('cookie_expires');
-				if ($cookie_expires == 0) {
-					$expires_time = time() + (60 * 60 * 24 * 365);
-				} else {
-					$expires_time = time() + (60 * $cookie_expires);
-				}
-				$passwordhash = md5($userinfo->password . $cookie_salt);
-
-				$query = $db->getQuery(true)
-					->select('sessionhash')
-					->from('#__session')
-					->where('userid = ' . (int)$userinfo->userid);
-
-				$db->setQuery($query);
-				$sessionhash = $db->loadResult();
-
-				$mainframe = Application::getInstance();
-				$cookie_sessionhash = $mainframe->input->cookie->get($cookie_prefix . 'sessionhash', '');
-				$cookie_userid = $mainframe->input->cookie->get($cookie_prefix . 'userid', '');
-				$cookie_password = $mainframe->input->cookie->get($cookie_prefix . 'password', '');
-
-				if (!empty($cookie_userid) && $cookie_userid == $userinfo->userid && !empty($cookie_password) && $cookie_password == $passwordhash) {
-					$vbcookieuser = true;
-				} else {
-					$vbcookieuser = false;
-				}
-
-				if (!$vbcookieuser && (empty($cookie_sessionhash) || $sessionhash != $cookie_sessionhash)) {
-					$secure = $this->params->get('secure', false);
-					$httponly = $this->params->get('httponly', true);
-
-					$cookies = Factory::getCookies();
-					$status[LogLevel::DEBUG][] = $cookies->addCookie($cookie_prefix . 'userid', $userinfo->userid, $expires_time,  $cookie_path, $cookie_domain, $secure, $httponly);
-					$status[LogLevel::DEBUG][] = $cookies->addCookie($cookie_prefix . 'password', $passwordhash, $expires_time, $cookie_path, $cookie_domain, $secure, $httponly, true);
-				} else {
-					$status[LogLevel::DEBUG][] = Text::_('VB_SESSION_ALREADY_ACTIVE');
-					/*
-				 * do not want to output as it indicate the cookies are set when they are not.
-				$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'userid', Text::_('VALUE') => $cookie_userid, Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
-				$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'password', Text::_('VALUE') => substr($cookie_password, 0, 6) . '********, ', Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
-				$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'sessionhash', Text::_('VALUE') => $cookie_sessionhash, Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
-				*/
-				}
+			if ($strikes >= 5) {
+				throw new RuntimeException(Text::_('VB_TOO_MANY_STRIKES'));
 			}
-		} catch (Exception $e) {
-			$status[LogLevel::ERROR][] = $e->getMessage();
+		}
+
+		//make sure a session is not already active for this user
+		$cookie_prefix = $this->params->get('cookie_prefix');
+		$vbversion = $this->helper->getVersion();
+		if ((int) substr($vbversion, 0, 1) > 3) {
+			if (substr($cookie_prefix, -1) !== '_') {
+				$cookie_prefix .= '_';
+			}
+		}
+		$cookie_salt = $this->params->get('cookie_salt');
+		$cookie_domain = $this->params->get('cookie_domain');
+		$cookie_path = $this->params->get('cookie_path');
+		$cookie_expires  = (!empty($options['remember'])) ? 0 : $this->params->get('cookie_expires');
+		if ($cookie_expires == 0) {
+			$expires_time = time() + (60 * 60 * 24 * 365);
+		} else {
+			$expires_time = time() + (60 * $cookie_expires);
+		}
+		$passwordhash = md5($userinfo->password . $cookie_salt);
+
+		$query = $db->getQuery(true)
+			->select('sessionhash')
+			->from('#__session')
+			->where('userid = ' . (int)$userinfo->userid);
+
+		$db->setQuery($query);
+		$sessionhash = $db->loadResult();
+
+		$mainframe = Application::getInstance();
+		$cookie_sessionhash = $mainframe->input->cookie->get($cookie_prefix . 'sessionhash', '');
+		$cookie_userid = $mainframe->input->cookie->get($cookie_prefix . 'userid', '');
+		$cookie_password = $mainframe->input->cookie->get($cookie_prefix . 'password', '');
+
+		if (!empty($cookie_userid) && $cookie_userid == $userinfo->userid && !empty($cookie_password) && $cookie_password == $passwordhash) {
+			$vbcookieuser = true;
+		} else {
+			$vbcookieuser = false;
+		}
+
+		if (!$vbcookieuser && (empty($cookie_sessionhash) || $sessionhash != $cookie_sessionhash)) {
+			$secure = $this->params->get('secure', false);
+			$httponly = $this->params->get('httponly', true);
+
+			$cookies = Factory::getCookies();
+			$status[LogLevel::DEBUG][] = $cookies->addCookie($cookie_prefix . 'userid', $userinfo->userid, $expires_time,  $cookie_path, $cookie_domain, $secure, $httponly);
+			$status[LogLevel::DEBUG][] = $cookies->addCookie($cookie_prefix . 'password', $passwordhash, $expires_time, $cookie_path, $cookie_domain, $secure, $httponly, true);
+		} else {
+			$status[LogLevel::DEBUG][] = Text::_('VB_SESSION_ALREADY_ACTIVE');
+			/**
+			 * do not want to output as it indicate the cookies are set when they are not.
+			$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'userid', Text::_('VALUE') => $cookie_userid, Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
+			$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'password', Text::_('VALUE') => substr($cookie_password, 0, 6) . '********, ', Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
+			$status[LogLevel::DEBUG][Text::_('COOKIES')][] = array(Text::_('NAME') => $cookie_prefix.'sessionhash', Text::_('VALUE') => $cookie_sessionhash, Text::_('EXPIRES') => $debug_expiration, Text::_('COOKIE_PATH') => $cookie_path, Text::_('COOKIE_DOMAIN') => $cookie_domain);
+			 */
 		}
 		return $status;
 	}
@@ -976,7 +969,9 @@ class User extends \JFusion\Plugin\User
 				$options = array();
 				$options['remember'] = 1;
 
-				$this->createSession($existinguser, $options);
+				if ($existinguser->canLogin()) {
+					$this->createSession($existinguser, $options);
+				}
 			}
 		} catch (Exception $e) {
 			$status['error'][] = $e->getMessage();

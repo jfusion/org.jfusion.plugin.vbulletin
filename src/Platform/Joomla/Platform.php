@@ -1140,9 +1140,11 @@ class Platform extends Joomla
 						$userinfo = $userPlugin->getUser($user_identifiers);
 						//create a new session
 						try {
-							$status = $userPlugin->createSession($userinfo, $options);
-							if ($debug) {
-								Framework::raise(LogLevel::NOTICE, $status, $this->getJname());
+							if ($userinfo->canLogin()) {
+								$status = $userPlugin->createSession($userinfo, $options);
+								if ($debug) {
+									Framework::raise(LogLevel::NOTICE, $status, $this->getJname());
+								}
 							}
 						} catch (Exception $e) {
 							Framework::raise(LogLevel::ERROR, $e, $this->getJname());
@@ -1236,9 +1238,11 @@ class Platform extends Joomla
 						global $JFusionActivePlugin;
 						$JFusionActivePlugin = $this->getJname();
 						try {
-							$status = $JoomlaUser->createSession($userinfo, $options);
-							if ($debug) {
-								Framework::raise(LogLevel::NOTICE, $status, $this->getJname());
+							if ($userinfo->canLogin()) {
+								$status = $JoomlaUser->createSession($userinfo, $options);
+								if ($debug) {
+									Framework::raise(LogLevel::NOTICE, $status, $this->getJname());
+								}
 							}
 						} catch (Exception $e) {
 							Framework::raise(LogLevel::ERROR, $e, $JoomlaUser->getJname());
