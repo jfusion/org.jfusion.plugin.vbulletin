@@ -1800,7 +1800,7 @@ PHP;
 		 * @ignore
 		 * @var $platform \JFusion\Plugin\Platform\Joomla
 		 */
-		$platform = Factory::getPlayform('Joomla', $this->getJname());
+		$platform = Factory::getPlatform('Joomla', $this->getJname());
 		$platform->filterActivityResults($results, 0, 'forumid', true);
 	}
 
@@ -1815,7 +1815,7 @@ PHP;
 		 * @ignore
 		 * @var $platform \JFusion\Plugin\Platform\Joomla
 		 */
-		$platform = Factory::getPlayform('Joomla', $this->getJname());
+		$platform = Factory::getPlatform('Joomla', $this->getJname());
 		return $platform->getPostURL($post->threadid, $post->postid);
 	}
 
@@ -1869,7 +1869,7 @@ PHP;
 				$config = Factory::getConfig();
 				$vbsefenabled = $config->get('sef');
 
-				$hooks = Factory::getPlayform($jfdata->platform, $this->getJname())->hasFile('hooks.php');
+				$hooks = Factory::getPlatform($jfdata->platform, $this->getJname())->hasFile('hooks.php');
 				if ($hooks) {
 					$hookFile = $hooks;
 				}
@@ -2281,7 +2281,7 @@ JS;
 							 * @ignore
 							 * @var $platform \JFusion\Plugin\Platform\Joomla
 							 */
-							$platform = Factory::getPlayform('Joomla', $profile_plugin);
+							$platform = Factory::getPlatform('Joomla', $profile_plugin);
 							$url = $platform->getProfileURL($userlookup->userid);
 						}
 					}

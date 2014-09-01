@@ -502,7 +502,10 @@ class executeJFusionHook
 
         //parse AJAX output
 	    if (defined('_VBJNAME')) {
-		    $platform = \JFusion\Factory::getPlayform('Joomla', _VBJNAME);
+		    /**
+		     * @var $platform \JFusion\Plugin\Platform\Joomla
+		     */
+		    $platform = \JFusion\Factory::getPlatform('Joomla', _VBJNAME);
 		    $params = \JFusion\Factory::getParams(_VBJNAME);
 
 		    $jdata = new stdClass();
