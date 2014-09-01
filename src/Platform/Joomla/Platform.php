@@ -16,6 +16,7 @@ use JFusion\User\Userinfo;
 use JFusion\Plugins\vbulletin\Helper;
 use JFusion\Plugin\Platform\Joomla;
 
+use Joomla\Form\Html\Select;
 use Joomla\Language\Text;
 use Joomla\Registry\Registry;
 use Joomla\Uri\Uri;
@@ -2487,6 +2488,7 @@ JS;
 
 	/**
 	 * @param $matches
+	 *
 	 * @return string
 	 */
 	function fixInclude($matches)
@@ -2511,6 +2513,7 @@ JS;
 
 	/**
 	 * @param $matches
+	 *
 	 * @return mixed|string
 	 */
 	function fixCSS($matches)
