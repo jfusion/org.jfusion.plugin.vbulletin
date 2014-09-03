@@ -2036,8 +2036,7 @@ JS;
 
 		//we need to find and change the call to vb yahoo connection file to our own customized one
 		//that adds the source url to the ajax calls
-		$yuiURL = JFusionFunction::getJoomlaURL() . JFUSION_PLUGIN_DIR_URL . $this->getJname();
-		$data->header = preg_replace('#\<script type="text\/javascript" src="(.*?)(connection-min.js|connection.js)\?v=(.*?)"\>#mS', "$js <script type=\"text/javascript\" src=\"$yuiURL/yui/connection/connection.js?v=$3\">", $data->header);
+		$data->header = preg_replace('#\<script type="text\/javascript" src="(.*?)(connection-min.js|connection.js)\?v=(.*?)"\>#mS', $js . ' <script type="text/javascript" src="' . $this->getUrl() . 'src/Platform/Joomla/yui/connection/connection.js?v=$3">', $data->header);
 		//convert relative links into absolute links
 		$url_search = '#(src="|background="|href="|url\("|url\(\'?)(?!http)(.*?)("\)|\'\)|"?)#mS';
 		$data->header = preg_replace_callback($url_search, array(&$this, 'fixInclude'), $data->header);
