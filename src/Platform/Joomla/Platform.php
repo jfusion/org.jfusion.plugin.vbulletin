@@ -12,6 +12,7 @@
 use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
+use JFusion\Parser\Parser;
 use JFusion\User\Userinfo;
 use JFusion\Plugins\vbulletin\Helper;
 use JFusion\Plugin\Platform\Joomla;
@@ -1365,7 +1366,8 @@ class Platform extends Joomla
 				$text = str_replace('{' . $plugin . '}', "", $text);
 			}
 			$text = html_entity_decode($text);
-			$text = Framework::parseCode($text, 'bbcode');
+			$parser = new Parser();
+			$text = $parser->parseCode($text, 'bbcode');
 		} elseif ($for == 'joomla' || ($for == 'activity' && $params->get('parse_text') == 'html')) {
 			static $custom_smileys, $vb_bbcodes;
 			$options = array();
@@ -1430,7 +1432,8 @@ class Platform extends Joomla
 				$status['limit_applied'] = 1;
 				$options['character_limit'] = $params->get('character_limit');
 			}
-			$text = Framework::parseCode($text, 'html', $options);
+			$parser = new Parser();
+			$text = $parser->parseCode($text, 'html', $options);
 
 			//remove the post id from any quote heads
 			$text = preg_replace('#<div class="bbcode_quote_head">(.*?);(.*?) (.*?):</div>#', '<div class="bbcode_quote_head">$1 $3:</div>', $text);
@@ -1467,10 +1470,12 @@ class Platform extends Joomla
 						$status['limit_applied'] = 1;
 						$options['character_limit'] = $params->get('character_limit');
 					}
-					$text = Framework::parseCode($text, 'plaintext', $options);
+					$parser = new Parser();
+					$text = $parser->parseCode($text, 'plaintext', $options);
 				}
 			} else {
-				$text = Framework::parseCode($text, 'plaintext');
+				$parser = new Parser();
+				$text = $parser->parseCode($text, 'plaintext');
 			}
 		}
 		return $status;
