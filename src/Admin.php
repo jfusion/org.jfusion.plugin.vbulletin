@@ -13,6 +13,7 @@ use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
 
+use JFusion\User\Groups;
 use Joomla\Database\DatabaseFactory;
 use Joomla\Form\Html\Select;
 use Joomla\Language\Text;
@@ -238,7 +239,7 @@ class Admin extends \JFusion\Plugin\Admin
 	 */
 	function getDefaultUsergroup()
 	{
-		$usergroup = Framework::getUserGroups($this->getJname(), true);
+		$usergroup = Groups::get($this->getJname(), true);
 
 		$group = array();
 		if ($usergroup !== null) {
@@ -735,6 +736,9 @@ HTML;
 
 		Application::getInstance()->loadScriptLanguage(array('MAIN_USERGROUP', 'DISPLAYGROUP', 'DEFAULT', 'MEMBERGROUPS'));
 
+		/**
+		 * TODO: update to pure jquery, see phpbb3/smf/smf2
+		 */
 		$js = <<<JS
 		JFusion.renderPlugin['{$jname}'] = function(index, plugin, pair) {
 			var usergroups = JFusion.usergroups[plugin.name];

@@ -12,6 +12,7 @@
 use JFusion\Application\Application;
 use JFusion\Factory;
 use JFusion\Framework;
+use JFusion\User\Groups;
 use JFusion\User\Userinfo;
 
 use Joomla\Form\Html\Select;
@@ -840,7 +841,7 @@ class User extends \JFusion\Plugin\User
 
 		$master = Framework::getMaster();
 		if ($master) {
-			$mastergroups = Framework::getUserGroups($master->name);
+			$mastergroups = Groups::get($master->name);
 
 			foreach ($mastergroups as $key => $mastergroup) {
 				if ($mastergroup) {
