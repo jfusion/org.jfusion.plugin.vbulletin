@@ -132,7 +132,9 @@ class Helper extends Plugin
     }
 
 	/**
+	 * @param $data
 	 *
+	 * @return mixed
 	 */
 	function decode($data) {
 		return json_decode($data, true);

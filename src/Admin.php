@@ -736,100 +736,109 @@ HTML;
 
 		Application::getInstance()->loadScriptLanguage(array('MAIN_USERGROUP', 'DISPLAYGROUP', 'DEFAULT', 'MEMBERGROUPS'));
 
-		/**
-		 * TODO: update to pure jquery, see phpbb3/smf/smf2
-		 */
 		$js = <<<JS
-		JFusion.renderPlugin['{$jname}'] = function(index, plugin, pair) {
-			var usergroups = JFusion.usergroups[plugin.name];
+		JFusion.renderPlugin['{$jname}'] = function(index, plugin, pair, usergroups) {
+			var defaultgroup = $(pair).prop('defaultgroup');
+			var displaygroup = $(pair).prop('displaygroup');
+			var membergroups = $(pair).prop('membergroups');
 
-			var div = new Element('div');
+			var root = $('<div></div>');
 
 			// render default group
-			div.appendChild(new Element('div', {'html': Joomla.JText._('MAIN_USERGROUP')}));
+			root.append($('<div>' + JFusion.Text._('MAIN_USERGROUP') + '</div>'));
 
-		    var defaultselect = new Element('select', {
-		    	'name': 'usergroups['+plugin.name+']['+index+'][defaultgroup]',
-		    	'id': 'usergroups_'+plugin.name+index+'defaultgroup'
-		    });
+			var defaultselect = $('<select></select>');
+			defaultselect.attr('name', 'usergroups['+plugin.name+']['+index+'][defaultgroup]');
+			defaultselect.attr('id', 'usergroups_'+plugin.name+index+'defaultgroup');
 
-			jQuery(document).on('change', '#usergroups_'+plugin.name+index+'defaultgroup', function() {
-                var value = this.get('value');
+			defaultselect.change(function() {
+                var value = $(this).val();
 
-				jQuery('#'+'usergroups_'+plugin.name+index+'membergroups'+' option').each(function() {
-					if (jQuery(this).attr('value') == value) {
-						jQuery(this).prop('selected', false);
-						jQuery(this).prop('disabled', true);
+				$('#'+'usergroups_'+plugin.name+index+'groups'+' option').each(function() {
+					if ($(this).val() == value) {
+						$(this).prop('selected', false);
+						$(this).prop('disabled', true);
 
-						jQuery(this).trigger('chosen:updated').trigger('liszt:updated');
-	                } else if (jQuery(this).prop('disabled') === true) {
-						jQuery(this).prop('disabled', false);
-						jQuery(this).trigger('chosen:updated').trigger('liszt:updated');
+						$(this).trigger('chosen:updated').trigger('liszt:updated');
+	                } else if ($(this).prop('disabled') === true) {
+						$(this).prop('disabled', false);
+						$(this).trigger('chosen:updated').trigger('liszt:updated');
 					}
 				});
 			});
 
-		    Array.each(usergroups, function (group) {
-			    var options = {'value': group.id,
-					            'html': group.name};
+    		$.each(usergroups, function( key, group ) {
+    			var option = $('<option></option>');
+				option.val(group.id);
+    			option.html(group.name);
 
-		        if (pair && pair.defaultgroup && pair.defaultgroup == group.id) {
-					options.selected = 'selected';
+		        if (pair && defaultgroup && defaultgroup == group.id) {
+					option.attr('selected','selected');
 		        }
 
-				defaultselect.appendChild(new Element('option', options));
-		    });
-		    div.appendChild(defaultselect);
+				defaultselect.append(option);
+    		});
+
+		    root.append(defaultselect);
 
 			// render display group
-			div.appendChild(new Element('div', {'html': Joomla.JText._('DISPLAYGROUP')}));
+			root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
 
-		    var displayselect = new Element('select', {
-			    'name': 'usergroups['+plugin.name+']['+index+'][displaygroup]',
-			    'id': 'usergroups_'+plugin.name+index+'displaygroup'});
+			var displayselect = $('<select></select>');
+			displayselect.attr('name', 'usergroups['+plugin.name+']['+index+'][displayselect]');
+			displayselect.attr('id', 'usergroups_'+plugin.name+index+'displayselect');
 
-			displayselect.appendChild(new Element('option', {'value': 0, 'html': Joomla.JText._('DEFAULT')}));
-		    Array.each(usergroups, function (group) {
+			root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
+
+			var defaultoption = $('<option></option>');
+				defaultoption.val(0);
+    			defaultoption.html(JFusion.Text._('DEFAULT'));
+
+			displayselect.append(defaultoption);
+
+			$.each(usergroups, function( key, group ) {
 			    if (group.id != 1 && group.id != 3 && group.id != 4) {
-				    var options = {'value': group.id,
-				            'html': group.name};
-				    if (pair && pair['displaygroup'] !== null && pair['displaygroup'] == group.id) {
-				    	options.selected = 'selected';
-				    }
+			    	var option = $('<option></option>');
+					option.val(group.id);
+    				option.html(group.name);
 
-			    	displayselect.appendChild(new Element('option', options));
+				    if (pair && displaygroup !== null && displaygroup == group.id) {
+				    	option.attr('selected', 'selected');
+				    }
+			    	displayselect.append(option);
 			    }
-		    });
-			div.appendChild(displayselect);
+    		});
+			root.append(displayselect);
+
 
 			// render default member groups
-			div.appendChild(new Element('div', {'html': Joomla.JText._('MEMBERGROUPS')}));
+			root.append($('<div>' + JFusion.Text._('MEMBERGROUPS') + '</div>'));
 
-		    var membergroupsselect = new Element('select', {
-		    	'name': 'usergroups['+plugin.name+']['+index+'][membergroups][]',
-		    	'multiple': 'multiple',
-		    	'id': 'usergroups_'+plugin.name+index+'membergroups'
-		    });
+			var membergroupsselect = $('<select></select>');
+			membergroupsselect.attr('name', 'usergroups['+plugin.name+']['+index+'][membergroups][]');
+			membergroupsselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups');
+			membergroupsselect.attr('multiple', 'multiple');
 
 		    Array.each(usergroups, function (group, i) {
-			    var options = {'id': 'usergroups_'+plugin.name+index+'membergroups'+group.id,
-			    				'value': group.id,
-					            'html': group.name};
+				var option = $('<option></option>');
+				displayselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups'+group.id);
+				option.val(group.id);
+                option.html(group.name);
 
-		        if (pair && pair.defaultgroup == group.id) {
-					options.disabled = 'disabled';
+		        if (pair && defaultgroup == group.id) {
+					option.attr('disabled', 'disabled');
 		        } else if (!pair && i === 0) {
-		        	options.disabled = 'disabled';
+		        	option.attr('disabled', 'disabled');
 		        } else {
-		            if (pair && pair.membergroups && pair.membergroups.contains(group.id)) {
-		            	options.selected = 'selected';
+		            if (pair && membergroups && membergroups.contains(group.id)) {
+		            	option.attr('selected', 'selected');
 			        }
 		        }
 
-				membergroupsselect.appendChild(new Element('option', options));
+				membergroupsselect.append(new Element('option', option));
 		    });
-			div.appendChild(membergroupsselect);
-		    return div;
+			root.append(membergroupsselect);
+		    return root;
 		};
 JS;
 		return $js;
