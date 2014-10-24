@@ -835,7 +835,7 @@ HTML;
 			        }
 		        }
 
-				membergroupsselect.append(new Element('option', option));
+				membergroupsselect.append(option);
 		    });
 			root.append(membergroupsselect);
 		    return root;
