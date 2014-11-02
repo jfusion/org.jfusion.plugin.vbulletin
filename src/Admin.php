@@ -336,6 +336,9 @@ class Admin extends \JFusion\Plugin\Admin
 	 */
 	function renderHook($name)
 	{
+		/**
+		 * TODO: REMOVE/MOVE ? or fix image path?
+		 */
 		try {
 			try {
 				$db = Factory::getDatabase($this->getJname());
