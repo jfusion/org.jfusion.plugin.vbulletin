@@ -741,107 +741,109 @@ HTML;
 
 		$js = <<<JS
 		JFusion.renderPlugin['{$jname}'] = function(index, plugin, pair, usergroups) {
-			var defaultgroup = $(pair).prop('defaultgroup');
-			var displaygroup = $(pair).prop('displaygroup');
-			var membergroups = $(pair).prop('membergroups');
+			return (function( $ ) {
+				var defaultgroup = $(pair).prop('defaultgroup');
+				var displaygroup = $(pair).prop('displaygroup');
+				var membergroups = $(pair).prop('membergroups');
 
-			var root = $('<div></div>');
+				var root = $('<div></div>');
 
-			// render default group
-			root.append($('<div>' + JFusion.Text._('MAIN_USERGROUP') + '</div>'));
+				// render default group
+				root.append($('<div>' + JFusion.Text._('MAIN_USERGROUP') + '</div>'));
 
-			var defaultselect = $('<select></select>');
-			defaultselect.attr('name', 'usergroups['+plugin.name+']['+index+'][defaultgroup]');
-			defaultselect.attr('id', 'usergroups_'+plugin.name+index+'defaultgroup');
+				var defaultselect = $('<select></select>');
+				defaultselect.attr('name', 'usergroups['+plugin.name+']['+index+'][defaultgroup]');
+				defaultselect.attr('id', 'usergroups_'+plugin.name+index+'defaultgroup');
 
-			defaultselect.change(function() {
-                var value = $(this).val();
+				defaultselect.change(function() {
+	                var value = $(this).val();
 
-				$('#'+'usergroups_'+plugin.name+index+'groups'+' option').each(function() {
-					if ($(this).val() == value) {
-						$(this).prop('selected', false);
-						$(this).prop('disabled', true);
+					$('#'+'usergroups_'+plugin.name+index+'groups'+' option').each(function() {
+						if ($(this).val() == value) {
+							$(this).prop('selected', false);
+							$(this).prop('disabled', true);
 
-						$(this).trigger('chosen:updated').trigger('liszt:updated');
-	                } else if ($(this).prop('disabled') === true) {
-						$(this).prop('disabled', false);
-						$(this).trigger('chosen:updated').trigger('liszt:updated');
-					}
+							$(this).trigger('chosen:updated').trigger('liszt:updated');
+		                } else if ($(this).prop('disabled') === true) {
+							$(this).prop('disabled', false);
+							$(this).trigger('chosen:updated').trigger('liszt:updated');
+						}
+					});
 				});
-			});
 
-    		$.each(usergroups, function( key, group ) {
-    			var option = $('<option></option>');
-				option.val(group.id);
-    			option.html(group.name);
-
-		        if (pair && defaultgroup && defaultgroup == group.id) {
-					option.attr('selected','selected');
-		        }
-
-				defaultselect.append(option);
-    		});
-
-		    root.append(defaultselect);
-
-			// render display group
-			root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
-
-			var displayselect = $('<select></select>');
-			displayselect.attr('name', 'usergroups['+plugin.name+']['+index+'][displayselect]');
-			displayselect.attr('id', 'usergroups_'+plugin.name+index+'displayselect');
-
-			root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
-
-			var defaultoption = $('<option></option>');
-				defaultoption.val(0);
-    			defaultoption.html(JFusion.Text._('DEFAULT'));
-
-			displayselect.append(defaultoption);
-
-			$.each(usergroups, function( key, group ) {
-			    if (group.id != 1 && group.id != 3 && group.id != 4) {
-			    	var option = $('<option></option>');
+	            $.each(usergroups, function( key, group ) {
+	                var option = $('<option></option>');
 					option.val(group.id);
-    				option.html(group.name);
+	                option.html(group.name);
 
-				    if (pair && displaygroup !== null && displaygroup == group.id) {
-				    	option.attr('selected', 'selected');
-				    }
-			    	displayselect.append(option);
-			    }
-    		});
-			root.append(displayselect);
-
-
-			// render default member groups
-			root.append($('<div>' + JFusion.Text._('MEMBERGROUPS') + '</div>'));
-
-			var membergroupsselect = $('<select></select>');
-			membergroupsselect.attr('name', 'usergroups['+plugin.name+']['+index+'][membergroups][]');
-			membergroupsselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups');
-			membergroupsselect.attr('multiple', 'multiple');
-
-		    Array.each(usergroups, function (group, i) {
-				var option = $('<option></option>');
-				displayselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups'+group.id);
-				option.val(group.id);
-                option.html(group.name);
-
-		        if (pair && defaultgroup == group.id) {
-					option.attr('disabled', 'disabled');
-		        } else if (!pair && i === 0) {
-		        	option.attr('disabled', 'disabled');
-		        } else {
-		            if (pair && membergroups && membergroups.contains(group.id)) {
-		            	option.attr('selected', 'selected');
+			        if (pair && defaultgroup && defaultgroup == group.id) {
+						option.attr('selected','selected');
 			        }
-		        }
 
-				membergroupsselect.append(option);
-		    });
-			root.append(membergroupsselect);
-		    return root;
+					defaultselect.append(option);
+	            });
+
+			    root.append(defaultselect);
+
+				// render display group
+				root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
+
+				var displayselect = $('<select></select>');
+				displayselect.attr('name', 'usergroups['+plugin.name+']['+index+'][displayselect]');
+				displayselect.attr('id', 'usergroups_'+plugin.name+index+'displayselect');
+
+				root.append($('<div>' + JFusion.Text._('DISPLAYGROUP') + '</div>'));
+
+				var defaultoption = $('<option></option>');
+					defaultoption.val(0);
+	                defaultoption.html(JFusion.Text._('DEFAULT'));
+
+				displayselect.append(defaultoption);
+
+				$.each(usergroups, function( key, group ) {
+				    if (group.id != 1 && group.id != 3 && group.id != 4) {
+				        var option = $('<option></option>');
+						option.val(group.id);
+	                    option.html(group.name);
+
+					    if (pair && displaygroup !== null && displaygroup == group.id) {
+					        option.attr('selected', 'selected');
+					    }
+				        displayselect.append(option);
+				    }
+	            });
+				root.append(displayselect);
+
+
+				// render default member groups
+				root.append($('<div>' + JFusion.Text._('MEMBERGROUPS') + '</div>'));
+
+				var membergroupsselect = $('<select></select>');
+				membergroupsselect.attr('name', 'usergroups['+plugin.name+']['+index+'][membergroups][]');
+				membergroupsselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups');
+				membergroupsselect.attr('multiple', 'multiple');
+
+			    Array.each(usergroups, function (group, i) {
+					var option = $('<option></option>');
+					displayselect.attr('id', 'usergroups_'+plugin.name+index+'membergroups'+group.id);
+					option.val(group.id);
+	                option.html(group.name);
+
+			        if (pair && defaultgroup == group.id) {
+						option.attr('disabled', 'disabled');
+			        } else if (!pair && i === 0) {
+			            option.attr('disabled', 'disabled');
+			        } else {
+			            if (pair && membergroups && membergroups.contains(group.id)) {
+			                option.attr('selected', 'selected');
+				        }
+			        }
+
+					membergroupsselect.append(option);
+			    });
+				root.append(membergroupsselect);
+			    return root;
+			})(jQuery);
 		};
 JS;
 		return $js;
