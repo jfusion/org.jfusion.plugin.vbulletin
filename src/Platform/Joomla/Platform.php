@@ -1541,7 +1541,7 @@ class Platform extends Joomla
 				$disable = Text::_('DISABLE_THIS_PLUGIN');
 				$reenable = Text::_('REENABLE_THIS_PLUGIN');
 				$output = <<<HTML
-                    <img style="float: left;" src="components/com_jfusion/images/check_good_small.png">
+					<span class="check" style="color: green;">&#x2714;</span>
                     <span style="float: left; margin-left: 5px;">{$enabled}</span>
                     <a style="margin-left:5px; float: left;" href="javascript:void(0);" onclick="return JFusion.Plugin.module('toggleHook', '{$name}', 'disable');">{$disable}</a>
                     <a style="margin-left:5px; float: left;" href="javascript:void(0);" onclick="return JFusion.Plugin.module('toggleHook', '{$name}', 'reenable');">{$reenable}</a>
@@ -1550,7 +1550,7 @@ HTML;
 				$disabled = Text::_('DISABLED');
 				$enable = Text::_('ENABLE_THIS_PLUGIN');
 				$output = <<<HTML
-                    <img style="float: left;" src="components/com_jfusion/images/check_bad_small.png">
+                    <span class="check" style="color: red;">&#x2716;</span>
                     <span style="float: left; margin-left: 5px;">{$disabled}</span>
                     <a style="margin-left:5px; float: left;" href="javascript:void(0);" onclick="return JFusion.Plugin.module('toggleHook', '{$name}', 'enable');">{$enable}</a>
 HTML;
