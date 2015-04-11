@@ -253,9 +253,8 @@ class executeJFusionJoomlaHook
                 define('_VBULLETIN_JFUSION_HOOK', true);
             }
             // do the login
-            global $JFusionActivePlugin;
 	        if (defined('_VBJNAME')) {
-		        $JFusionActivePlugin =  _VBJNAME;
+		        \JFusion\Factory::getStatus()->set('active.plugin', _VBJNAME);
 	        }
             $baseURL = (class_exists('JFusionFunction')) ? \JFusionFunction::getJoomlaURL() : JUri::root();
             $loginURL = JRoute::_($baseURL . 'index.php?option=com_user&task=login', false);
@@ -299,9 +298,8 @@ class executeJFusionJoomlaHook
                 $mainframe = JFactory::getApplication('site');
                 define('_VBULLETIN_JFUSION_HOOK', true);
             }
-            global $JFusionActivePlugin;
 	        if (defined('_VBJNAME')) {
-		        $JFusionActivePlugin =  _VBJNAME;
+		        \JFusion\Factory::getStatus()->set('active.plugin', _VBJNAME);
 	        }
             // logout any joomla users
             $mainframe->logout();

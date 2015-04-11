@@ -1237,8 +1237,7 @@ class Platform extends Joomla
 					$JoomlaUser = Factory::getUser('joomla_int');
 					$userinfo = $JoomlaUser->getUser($user_identifiers);
 					if (!empty($userinfo)) {
-						global $JFusionActivePlugin;
-						$JFusionActivePlugin = $this->getJname();
+						\JFusion\Factory::getStatus()->set('active.plugin', $this->getJname());
 						try {
 							if ($userinfo->canLogin()) {
 								$status = $JoomlaUser->createSession($userinfo, $options);
@@ -1679,9 +1678,9 @@ PHP;
 		} elseif ($plugin == 'duallogin') {
 			//only login if not logging into the frontend of the forum and if $JFusionActivePlugin is not active for this plugin
 			$inner =<<<PHP
-			global \$JFusionActivePlugin,\$JFusionLoginCheckActive;
-			if (empty(\$_POST['logintype']) && \$JFusionActivePlugin != '{$jname}' && empty(\$JFusionLoginCheckActive)) {
-				\$JFusionActivePlugin = '{$jname}';
+			global \$JFusionLoginCheckActive;
+			if (empty(\$_POST['logintype']) && \\JFusion\\Factory::getStatus()->get('active.plugin') != '{$jname}' && empty(\$JFusionLoginCheckActive)) {
+				\\JFusion\\Factory::getStatus()->set('active.plugin', '{$jname}');
 				//set the JPATH_BASE needed to initiate Joomla if no already inside Joomla
 				defined('JPATH_BASE') or define('JPATH_BASE','" . JPATH_ROOT . "');
 PHP;
