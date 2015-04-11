@@ -1678,8 +1678,7 @@ PHP;
 		} elseif ($plugin == 'duallogin') {
 			//only login if not logging into the frontend of the forum and if $JFusionActivePlugin is not active for this plugin
 			$inner =<<<PHP
-			global \$JFusionLoginCheckActive;
-			if (empty(\$_POST['logintype']) && \\JFusion\\Factory::getStatus()->get('active.plugin') != '{$jname}' && empty(\$JFusionLoginCheckActive)) {
+			if (empty(\$_POST['logintype']) && \\JFusion\\Factory::getStatus()->get('active.plugin') != '{$jname}' &&  !\\JFusion\\Factory::getStatus()->get('active.logincheck', false)) {
 				\\JFusion\\Factory::getStatus()->set('active.plugin', '{$jname}');
 				//set the JPATH_BASE needed to initiate Joomla if no already inside Joomla
 				defined('JPATH_BASE') or define('JPATH_BASE','" . JPATH_ROOT . "');
