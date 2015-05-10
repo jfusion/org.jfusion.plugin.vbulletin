@@ -1958,69 +1958,59 @@ PHP;
 		}
 	}
 
-	/**
-	 * @param object $data
-	 *
-	 * @return void
-	 */
-	function parseBody(&$data)
+	function parseBody()
 	{
 		global $baseURL, $fullURL, $integratedURL, $vbsefmode, $vbsefenabled;
-		$baseURL = $data->baseURL;
-		$fullURL = $data->fullURL;
-		$integratedURL = $data->integratedURL;
+		$baseURL = $this->data->baseURL;
+		$fullURL = $this->data->fullURL;
+		$integratedURL = $this->data->integratedURL;
 		$vbsefmode = $this->params->get('sefmode', 0);
 		$vbsefenabled = Config::get()->get('sef');
 		//fix for form actions
 		//cannot use preg_replace here because it adds unneeded slashes which messes up JS
 		$action_search = '#action="(?!http)(.*?)"(.*?)>#mS';
 
-		$data->body = preg_replace_callback($action_search, array(&$this, 'fixAction'), $data->body);
+		$this->data->body = preg_replace_callback($action_search, array(&$this, 'fixAction'), $this->data->body);
 		//fix for the rest of the urls
 		$url_search = '#href="(?!http)(.*?)"(.*?)>#mSs';
-		$data->body = preg_replace_callback($url_search, array(&$this, 'fixURL'), $data->body);
+		$this->data->body = preg_replace_callback($url_search, array(&$this, 'fixURL'), $this->data->body);
 		//$url_search = '#<link="(?!http)(.*?)"(.*?)>#mS';
-		//$data->body = preg_replace_callback($url_search, array(&$this, 'fixURL'), $data->body);
+		//$this->data->body = preg_replace_callback($url_search, array(&$this, 'fixURL'), $this->data->body);
 		//convert relative urls in JS links
 		$url_search = '#window.location=\'(?!http)(.*?)\'#mS';
 
-		$data->body = preg_replace_callback($url_search, array(&$this, 'fixJS'), $data->body);
+		$this->data->body = preg_replace_callback($url_search, array(&$this, 'fixJS'), $this->data->body);
 		//convert relative links from images and js files into absolute links
 		$include_search = "#(src=\"|background=\"|url\('|open_window\(\\\\'|window.open\('|window.open\(\"?)(?!http)(.*?)(\\\\',|',|\"|'\)|')#mS";
 
-		$data->body = preg_replace_callback($include_search, array(&$this, 'fixInclude'), $data->body);
+		$this->data->body = preg_replace_callback($include_search, array(&$this, 'fixInclude'), $this->data->body);
 		//we need to fix the cron.php file
-		$data->body = preg_replace('#src="(.*)cron.php(.*)>#mS', 'src="' . $integratedURL . 'cron.php$2>', $data->body);
+		$this->data->body = preg_replace('#src="(.*)cron.php(.*)>#mS', 'src="' . $integratedURL . 'cron.php$2>', $this->data->body);
 		//if we have custom register and lost password urls and vBulletin uses an absolute URL, fixURL will not catch it
 		$register_url = $this->params->get('register_url');
 		if (!empty($register_url)) {
-			$data->body = str_replace($integratedURL . 'register.php', $register_url, $data->body);
+			$this->data->body = str_replace($integratedURL . 'register.php', $register_url, $this->data->body);
 		}
 		$lostpassword_url = $this->params->get('lostpassword_url');
 		if (!empty($lostpassword_url)) {
-			$data->body = str_replace($integratedURL . 'login.php?do=lostpw', $lostpassword_url, $data->body);
+			$this->data->body = str_replace($integratedURL . 'login.php?do=lostpw', $lostpassword_url, $this->data->body);
 		}
 		if ($this->params->get('parseCSS', false)) {
 			//we need to wrap the body in a div to prevent some CSS clashes
-			$data->body = '<div id="framelessVb">' . $data->body . '</div>';
+			$this->data->body = '<div id="framelessVb">' . $this->data->body . '</div>';
 		}
 		if (defined('_JFUSION_DEBUG')) {
-			$data->body.= '<pre><code>' . htmlentities(print_r($_SESSION['jfvbdebug'], true)) . '</code></pre>';
-			$data->body.= '<pre><code>' . htmlentities(print_r($GLOBALS['vbulletin'], true)) . '</code></pre>';
+			$this->data->body.= '<pre><code>' . htmlentities(print_r($_SESSION['jfvbdebug'], true)) . '</code></pre>';
+			$this->data->body.= '<pre><code>' . htmlentities(print_r($GLOBALS['vbulletin'], true)) . '</code></pre>';
 		}
 	}
 
-	/**
-	 * @param object $data
-	 *
-	 * @return void
-	 */
-	function parseHeader(&$data)
+	function parseHeader()
 	{
 		global $baseURL, $fullURL, $integratedURL, $vbsefmode, $vbsefenabled;
-		$baseURL = $data->baseURL;
-		$fullURL = $data->fullURL;
-		$integratedURL = $data->integratedURL;
+		$baseURL = $this->data->baseURL;
+		$fullURL = $this->data->fullURL;
+		$integratedURL = $this->data->integratedURL;
 		$vbsefmode = $this->params->get('sefmode', 0);
 		$vbsefenabled = Config::get()->get('sef');
 		$js = '<script type="text/javascript">';
@@ -2031,13 +2021,13 @@ JS;
 
 		//we need to find and change the call to vb yahoo connection file to our own customized one
 		//that adds the source url to the ajax calls
-		$data->header = preg_replace('#\<script type="text\/javascript" src="(.*?)(connection-min.js|connection.js)\?v=(.*?)"\>#mS', $js . ' <script type="text/javascript" src="' . $this->getUrl() . 'src/Platform/Joomla/yui/connection/connection.js?v=$3">', $data->header);
+		$this->data->header = preg_replace('#\<script type="text\/javascript" src="(.*?)(connection-min.js|connection.js)\?v=(.*?)"\>#mS', $js . ' <script type="text/javascript" src="' . $this->getUrl() . 'src/Platform/Joomla/yui/connection/connection.js?v=$3">', $this->data->header);
 		//convert relative links into absolute links
 		$url_search = '#(src="|background="|href="|url\("|url\(\'?)(?!http)(.*?)("\)|\'\)|"?)#mS';
-		$data->header = preg_replace_callback($url_search, array(&$this, 'fixInclude'), $data->header);
+		$this->data->header = preg_replace_callback($url_search, array(&$this, 'fixInclude'), $this->data->header);
 		if ($this->params->get('parseCSS', false)) {
 			$css_search = '#<style type="text/css" id="vbulletin(.*?)">(.*?)</style>#ms';
-			$data->header = preg_replace_callback($css_search, array(&$this, 'fixCSS'), $data->header);
+			$this->data->header = preg_replace_callback($css_search, array(&$this, 'fixCSS'), $this->data->header);
 		}
 	}
 
