@@ -10,6 +10,7 @@
  */
 
 use JFusion\Application\Application;
+use JFusion\Config;
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\User\Groups;
@@ -656,8 +657,7 @@ class User extends \JFusion\Plugin\User
 
 			//set the timezone
 			if (!isset($userinfo->timezone)) {
-				$config = Factory::getConfig();
-				$userinfo->timezone = $config->get('offset', 'UTC');
+				$userinfo->timezone = Config::get()->get('offset', 'UTC');
 			}
 
 			$timezone = new DateTimeZone($userinfo->timezone);

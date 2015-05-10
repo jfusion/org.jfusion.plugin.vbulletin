@@ -10,6 +10,7 @@
  */
 
 use JFusion\Application\Application;
+use JFusion\Config;
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\Parser\Parser;
@@ -131,7 +132,7 @@ class Platform extends Joomla
 
         $useContentDate = $dbparams->get('use_content_created_date', false);
         if ($useContentDate) {
-            $timezone = Factory::getConfig()->get('offset');
+            $timezone = Config::get()->get('offset');
             $timestamp = strtotime($contentitem->created);
             //undo Joomla timezone offset
             $timestamp += ($timezone * 3600);
@@ -1237,7 +1238,7 @@ class Platform extends Joomla
 					$JoomlaUser = Factory::getUser('joomla_int');
 					$userinfo = $JoomlaUser->getUser($user_identifiers);
 					if (!empty($userinfo)) {
-						\JFusion\Factory::getStatus()->set('active.plugin', $this->getJname());
+						Factory::getStatus()->set('active.plugin', $this->getJname());
 						try {
 							if ($userinfo->canLogin()) {
 								$status = $JoomlaUser->createSession($userinfo, $options);
@@ -1626,10 +1627,9 @@ HTML;
 
 		$jname = $this->getJname();
 
-		$config = JFactory::getConfig();
 		if ($plugin == 'redirect') {
 			$sefmode = $this->params->get('sefmode', 0);
-			$sef = $config->get('sef');
+			$sef = Config::get()->get('sef');
 			//get the baseUR
 			$app = JFactory::getApplication('site');
 			$router = $app->getRouter();
@@ -1695,7 +1695,7 @@ PHP;
 
 			$hookFile = __DIR__ . '/hooks.php';
 			$path = str_replace(DIRECTORY_SEPARATOR . 'administrator', '', JPATH_BASE);
-			$secret = $this->params->get('vb_secret', $config->get('secret'));
+			$secret = $this->params->get('vb_secret', Config::get()->get('secret'));
 
 			$php =<<<PHP
 			defined('_VBJNAME') or define('_VBJNAME', '{$jname}');
@@ -1870,8 +1870,7 @@ PHP;
 				$source_path = $this->params->get('source_path');
 				$baseURL = $jfdata->baseURL;
 				$integratedURL = $jfdata->integratedURL;
-				$config = Factory::getConfig();
-				$vbsefenabled = $config->get('sef');
+				$vbsefenabled = Config::get()->get('sef');
 
 				$hooks = Factory::getPlatform($jfdata->platform, $this->getJname())->hasFile('hooks.php');
 				if ($hooks) {
@@ -1971,8 +1970,7 @@ PHP;
 		$fullURL = $data->fullURL;
 		$integratedURL = $data->integratedURL;
 		$vbsefmode = $this->params->get('sefmode', 0);
-		$config = Factory::getConfig();
-		$vbsefenabled = $config->get('sef');
+		$vbsefenabled = Config::get()->get('sef');
 		//fix for form actions
 		//cannot use preg_replace here because it adds unneeded slashes which messes up JS
 		$action_search = '#action="(?!http)(.*?)"(.*?)>#mS';
@@ -2024,8 +2022,7 @@ PHP;
 		$fullURL = $data->fullURL;
 		$integratedURL = $data->integratedURL;
 		$vbsefmode = $this->params->get('sefmode', 0);
-		$config = Factory::getConfig();
-		$vbsefenabled = $config->get('sef');
+		$vbsefenabled = Config::get()->get('sef');
 		$js = '<script type="text/javascript">';
 		$js .= <<<JS
             var vbSourceURL = '{$integratedURL}';

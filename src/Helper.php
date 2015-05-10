@@ -10,6 +10,7 @@
  */
 
 use JFusion\Application\Application;
+use JFusion\Config;
 use JFusion\Factory;
 use JFusion\Framework;
 use JFusion\Plugin\Plugin;
@@ -44,7 +45,7 @@ class Helper extends Plugin
      * @return string
      */
     function encryptApiData($data) {
-        $key = $this->params->get('vb_secret', Factory::getConfig()->get('secret'));
+        $key = $this->params->get('vb_secret', Config::get()->get('secret'));
         $data['jfvbkey'] = $key;
         return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, serialize($data), MCRYPT_MODE_ECB, mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND)));
     }

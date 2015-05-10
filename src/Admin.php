@@ -10,6 +10,7 @@
  */
 
 use JFusion\Application\Application;
+use JFusion\Config;
 use JFusion\Factory;
 use JFusion\Framework;
 
@@ -596,7 +597,7 @@ HTML;
 		$php .= "if (file_exists(JFUSION_VB_HOOK_FILE)) {\n";
 		$php .= "include_once(JFUSION_VB_HOOK_FILE);\n";
 		$php .= "\$val = '$plugin';\n";
-		$secret = $this->params->get('vb_secret', Factory::getConfig()->get('secret'));
+		$secret = $this->params->get('vb_secret', Config::get()->get('secret'));
 		$php .= "\$JFusionHook = new executeJFusionHook('init_startup', \$val, '$secret');\n";
 
 		$version = $this->helper->getVersion();
