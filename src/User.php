@@ -57,28 +57,30 @@ class User extends \JFusion\Plugin\User
 	{
 		$user = null;
 		try {
+			// Get user info from database
+			$db = Factory::getDatabase($this->getJname());
+
 			if($identifier_type == 'auto') {
 				//get the identifier
 				list($identifier_type, $identifier) = $this->getUserIdentifier($userinfo, 'u.username', 'u.email', 'u.userid');
 				if ($identifier_type == 'u.username') {
 					//lower the username for case insensitivity purposes
-					$identifier_type = 'LOWER(u.username)';
+					$identifier_type = 'LOWER(' . $db->quoteName('u.username') . ')';
+
 					$identifier = strtolower($identifier);
 				}
 			} else {
-				$identifier_type = 'u.' . $identifier_type;
+				$identifier_type = $db->quoteName('u.' . $identifier_type);
+
 				$identifier = $userinfo;
 			}
-
-			// Get user info from database
-			$db = Factory::getDatabase($this->getJname());
 
 			$name_field = $this->params->get('name_field');
 
 			$query = $db->getQuery(true)
 				->select('u.userid, u.username, u.email, u.usergroupid AS group_id, u.membergroupids, u.displaygroupid, u.password, u.salt as password_salt, u.usertitle, u.customtitle, u.posts, u.username as name')
 				->from('#__user AS u')
-				->where($db->quoteName($identifier_type) . ' = ' . $db->quote($identifier));
+				->where($identifier_type . ' = ' . $db->quote($identifier));
 
 			if ($ignore_id) {
 				$query->where('u.userid != ' . $ignore_id);
